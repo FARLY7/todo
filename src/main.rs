@@ -3,7 +3,8 @@ use todo::{help, Todo};
 
 fn main()
 {
-    let todo = Todo{};
+    let todo = Todo::new().expect("Failed to create todo instance");
+
     let args: Vec<String> = env::args().collect();
 
     if args.len() > 1 {

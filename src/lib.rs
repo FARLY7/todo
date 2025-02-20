@@ -1,16 +1,46 @@
+use std::io::Write;
 use std::process;
-
-
+use std::fs;
+use std::fs::File;
+use std::io::ErrorKind;
 
 pub struct Todo {
 
 }
 
-
 impl Todo {
 
+    pub fn new() -> Result<Self, String> {
+
+        /* Attempt to open todo file. If doesn't exist, then create one */
+        let mut todo_file = match File::options().append(true).open("todo.txt") {
+            Ok(file) => file,
+            Err(e) => match e.kind() {
+                ErrorKind::NotFound => match File::create("todo.txt") {
+                    Ok(file) => file,
+                    Err(e) => panic!("Failed to create todo file {e:?}")
+                }
+                _ => panic!("Failed to open todo file")
+            }
+        };
+
+        let bytes_written = todo_file.write(b"Some bytes").unwrap();
+        println!("Bytes written {bytes_written}");
+
+        /* Return Todo object */
+        Ok(
+            Todo{}
+        )
+    }
+
     pub fn list(&self) {
-        println!("List command");
+
+        let contents = fs::read_to_string("todo.txt");
+        
+        match contents {
+            Ok(c) => println!("{}", &c),
+            Err(result) => println!("Error when opening file (err={})", result)
+        }
     }
 
     pub fn add(&self, tasks: &[String]) {
